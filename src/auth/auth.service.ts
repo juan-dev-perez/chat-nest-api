@@ -20,7 +20,7 @@ export class AuthService {
 
         const { email, password } = loginUserDto;
 
-        const user = await this.userModel.findOne({email}, '-_id email password');
+        const user = await this.userModel.findOne({email}, '_id email password');
         if( !user )
             throw new UnauthorizedException('There is no user with this email');
         
@@ -29,7 +29,7 @@ export class AuthService {
 
         return {
             user,
-            token: this.getJwt({ email: user.email })
+            token: this.getJwt({  id: user._id.toString() })
         };
     }
 

@@ -24,8 +24,8 @@ export class UsersService {
         });
         await user.save();
         return {
-            ...user,
-            token: this.authService.getJwt({ email: user.email })
+            user,
+            token: this.authService.getJwt({  id: user._id.toString() })
         };
     }
 

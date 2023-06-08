@@ -1,6 +1,9 @@
-import { Body, Controller, Get, Param, NotFoundException, Delete, HttpCode, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, NotFoundException, Delete, HttpCode, Patch, Post, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto, UpdateUserDto } from './dto';
+import { AuthGuard } from '@nestjs/passport';
+import { GetUser } from '../auth/decorators/get-user.decorator';
+import { User } from './schemas/user.schema';
 
 @Controller('users')
 export class UsersController {
@@ -19,7 +22,8 @@ export class UsersController {
     }
 
     @Get()
-    async getAll(){
+    @UseGuards( AuthGuard() )
+    async getAll(@GetUser() user: User){
         return await this.usersService.getAll();
     }
 
