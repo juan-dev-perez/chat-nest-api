@@ -1,8 +1,9 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { PreSaveMiddlewareFunction, PreMiddlewareFunction } from "mongoose";
 
 @Schema()
 export class User{
+
+    _id: string;
 
     @Prop({
         unique: true,

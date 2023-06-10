@@ -53,7 +53,8 @@ export class UsersService {
     handleDBErrors(error: any): never{
         if( error.code === 11000 )
             throw new BadRequestException( 'email is already used, must be unique' );
-            
+        
+        console.log(error);
         throw new InternalServerErrorException('Please check server logs');
     }
 
