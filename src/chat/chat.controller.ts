@@ -1,4 +1,4 @@
-import { Controller, Post, UseGuards, Body, Get } from '@nestjs/common';
+import { Controller, Post, UseGuards, Body, Get, Param } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from '../auth/decorators/get-user.decorator';
 import { User } from '../users/schemas/user.schema';
@@ -25,6 +25,15 @@ export class ChatController {
     @UseGuards( AuthGuard() )
     getChats(@GetUser() user: User){
         return this.chatService.getChats(user);
+    }
+
+    @Get(':userDos')
+    @UseGuards( AuthGuard() )
+    getOneChat(
+        @GetUser() user: User,
+        @Param('userDos') userDos: string 
+    ){
+        return this.chatService.getOneChat(user, userDos);
     }
 
 }

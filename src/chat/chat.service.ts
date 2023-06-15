@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { User } from '../users/schemas/user.schema';
 import { InjectModel } from '@nestjs/mongoose';
-import { Chat } from './schemas/chat.schema';
 import { Model } from 'mongoose';
 import { NewMessageDto } from './dto/new-message.dto';
+import { Chat } from './schemas/chat.schema';
 
 @Injectable()
 export class ChatService {
@@ -16,13 +16,22 @@ export class ChatService {
     async newMessage(newMessageDto: NewMessageDto, user: User){
         const { receivingUser, message } = newMessageDto;
         const users = [user._id, receivingUser];
-        const messages = [{
+        const messages = {
             sendingUser: user._id,
             message
-        }];
+        };
+
+        const chat = await this.getOneChat(user,receivingUser);
+
+        if(chat){
+            chat.messages.push(messages);
+            await chat.save();
+            return chat;
+        }
+
         const newMessage = new this.chatModel({
-            users,
-            messages
+        users,
+        messages
         })
         await newMessage.save();
         return   newMessage ;
@@ -31,6 +40,11 @@ export class ChatService {
     async getChats(user: User){
         const chats = await this.chatModel.find({users: user._id});
         return chats;
+    }
+
+    async getOneChat(user: User, userDos: string){
+        const chat = await this.chatModel.findOne({ users: { $all: [user._id, userDos] } });
+        return chat;
     }
 
 }
