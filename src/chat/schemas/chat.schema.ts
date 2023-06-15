@@ -3,6 +3,8 @@ import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 @Schema({ timestamps: true })
 class Message {
 
+    _id?: string;
+
     @Prop({
         required: true,
         trim: true

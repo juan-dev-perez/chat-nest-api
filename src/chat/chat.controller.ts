@@ -1,4 +1,4 @@
-import { Controller, Post, UseGuards, Body, Get, Param } from '@nestjs/common';
+import { Controller, Post, UseGuards, Body, Get, Param, Delete } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from '../auth/decorators/get-user.decorator';
 import { User } from '../users/schemas/user.schema';
@@ -34,6 +34,25 @@ export class ChatController {
         @Param('userDos') userDos: string 
     ){
         return this.chatService.getOneChat(user, userDos);
+    }
+
+    @Delete('delete-message/:userDos/:idMessage')
+    @UseGuards( AuthGuard() )
+    deleteOneMessage(
+        @GetUser() user: User,
+        @Param('userDos') userDos: string,
+        @Param('idMessage') idMessage: string,
+    ){
+        return this.chatService.deleteOneMessage(user,userDos,idMessage);
+    }
+
+    @Delete('delete-chat/:userDos')
+    @UseGuards( AuthGuard() )
+    deleteOneChat(
+        @GetUser() user: User,
+        @Param('userDos') userDos: string,
+    ){
+        return this.chatService.deleteOneChat(user,userDos);
     }
 
 }
