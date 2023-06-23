@@ -4,6 +4,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { NewMessageDto } from './dto/new-message.dto';
 import { Chat } from './schemas/chat.schema';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class ChatService {
@@ -11,6 +12,7 @@ export class ChatService {
     constructor(
         @InjectModel(Chat.name)
         private readonly chatModel: Model<Chat>,
+        private readonly usersService: UsersService,
     ){}
 
     async newMessage(newMessageDto: NewMessageDto, user: User){
@@ -39,7 +41,13 @@ export class ChatService {
 
     async getChats(user: User){
         const chats = await this.chatModel.find({users: user._id});
-        return chats;
+        let idUsers = [];
+        chats.forEach( chat => {
+            idUsers.push(chat.users[0]);
+            idUsers.push(chat.users[1]);
+        });
+        const users = await this.usersService.getSome(idUsers)
+        return {chats, users, user};
     }
 
     async getOneChat(user: User, userDos: string){

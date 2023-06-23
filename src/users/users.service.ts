@@ -33,6 +33,10 @@ export class UsersService {
         return await this.userModel.find();
     }
 
+    async getSome(idUsers:string[]){
+        return await this.userModel.find({$or: [ {'_id':idUsers} ]});
+    }
+
     async getOne(id: string){
         return await this.userModel.findById(id);
     }
