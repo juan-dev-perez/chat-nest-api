@@ -40,6 +40,8 @@ export class ChatService {
     }
 
     async getChats(user: User){
+        console.log(user);
+        
         const chats = await this.chatModel.find({users: user._id});
         let idUsers = [];
         chats.forEach( chat => {
