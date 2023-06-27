@@ -19,7 +19,7 @@ export class ChatService {
         const { receivingUser, message } = newMessageDto;
         const users = [user._id, receivingUser];
         const messages = {
-            sendingUser: user._id,
+            sendingUser: user._id as string,
             message
         };
 
