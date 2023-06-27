@@ -24,6 +24,8 @@ const MessageSchema = SchemaFactory.createForClass(Message);
 @Schema()
 export class Chat{
 
+    _id: string;
+
     @Prop({
         type: [String],
         required: true
