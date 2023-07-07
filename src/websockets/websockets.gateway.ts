@@ -15,7 +15,6 @@ export class WebsocketsGateway implements OnGatewayConnection, OnGatewayDisconne
   ) {}
 
   async handleConnection(client: Socket ) {
-    // console.log('User conected: ', client.id);
     const token = client.handshake.headers.jwtclient as string;
     let payload: {id: string};
     try{      
@@ -25,20 +24,21 @@ export class WebsocketsGateway implements OnGatewayConnection, OnGatewayDisconne
       client.disconnect();
       return;
     }
-    // console.log(this.websocketsService.connectedUsers);
-    
   }
 
   handleDisconnect(client: Socket ) {
-    // console.log('User disconected: ', client.id);
-    this.websocketsService.removeConnectedUser(client.id)
+    this.websocketsService.removeConnectedUser(client.id);
   }
 
   @SubscribeMessage('message-from-client')
   onMessageFromClient( client: Socket, payload: Chat){
+
+    //this is used to know which is the receiving client socketId
     const receivingClient = this.websocketsService.getReceivingUserId(client, payload);
-    if(receivingClient) 
+
+    if(receivingClient)
       client.to(receivingClient).emit('message-from-server',payload);
+
     client.emit('message-from-server',payload);
   }
 

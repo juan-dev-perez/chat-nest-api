@@ -39,10 +39,8 @@ export class WebsocketsService {
 
     getReceivingUserId(client:Socket, chat: Chat){
 
-        const token = client.handshake.headers.jwtclient as string;
-        const sendingUserId = this.jwtService.verify(token);
-
-        const receivingUser = chat.users.find( user => user !== sendingUserId.id);
+        const sendingUserId = this.connectedUsers[client.id].user._id.toString();
+        const receivingUser = chat.users.find( user => user !== sendingUserId);
 
         for (const clientId of Object.keys(this.connectedUsers) ) {
             const connectedUser = this.connectedUsers[clientId];
