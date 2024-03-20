@@ -33,6 +33,9 @@ export class User{
     
     @Prop()
     photo?: string;
+
+    @Prop()
+    contacts?: string[];
     
     @Prop({
         default: true
