@@ -42,17 +42,18 @@ export class UsersController {
         return user;
     }
 
-    @Patch(':id')
+    @Patch()
+    @UseGuards( AuthGuard() )
     async update(
-        @Param('id') id: string,
+        @GetUser() user: User,
         @Body() updateUserDto: UpdateUserDto
     ){
-        const user = await this.usersService.update(id, updateUserDto);
-        if(!user) throw new NotFoundException('User not found');
-        return user;
+        const userUpdated = await this.usersService.update(user._id, updateUserDto);
+        if(!userUpdated) throw new NotFoundException('User not found');
+        return userUpdated;
     }
 
-    @Patch(':id')
+    @Patch(':id') 
     async inActivate( @Param('id') id: string, ){
         const user = await this.usersService.inActivate(id);
         if(!user) throw new NotFoundException('User not found');
