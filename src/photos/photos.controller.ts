@@ -8,6 +8,9 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { photofilter, photoNamer } from './helpers';
 import { v2 as cloudinary } from 'cloudinary';
+import { AuthGuard } from '@nestjs/passport';
+import { GetUser } from 'src/auth/decorators/get-user.decorator';
+import { User } from 'src/users/schemas/user.schema';
 
 @Controller('photos')
 export class PhotosController {
@@ -20,14 +23,17 @@ export class PhotosController {
   }
 
   @Post()
+  @UseGuards(AuthGuard())
   @UseInterceptors(
     FileInterceptor('photo', {
       fileFilter: photofilter,
     }),
   )
-  async uploadProfilePhoto(@UploadedFile() photo: Express.Multer.File) {
-    //TODO: mandar el id del usuario para el nombre de la foto
-    const filename = photoNamer(photo, '123');
+  async uploadProfilePhoto(
+    @UploadedFile() photo: Express.Multer.File,
+    @GetUser() user: User,
+  ) {
+    const filename = photoNamer(photo, user._id);
     try {
       const result = await new Promise((resolve, reject) => {
         const uploadStream = cloudinary.uploader.upload_stream(
