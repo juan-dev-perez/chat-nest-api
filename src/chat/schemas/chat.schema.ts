@@ -16,6 +16,9 @@ class Message {
     })
     message: string;
 
+    @Prop({type: Boolean, default: false})
+    seen?: boolean;
+
 }
 
 const MessageSchema = SchemaFactory.createForClass(Message);
