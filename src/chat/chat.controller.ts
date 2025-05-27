@@ -33,7 +33,7 @@ export class ChatController {
         @GetUser() user: User,
         @Param('userDos') userDos: string 
     ){
-        return this.chatService.getOneChat(user, userDos);
+        return this.chatService.getOneChat(user._id, userDos);
     }
 
     @Delete('delete-message/:userDos/:idMessage')

@@ -42,4 +42,16 @@ export class WebsocketsGateway implements OnGatewayConnection, OnGatewayDisconne
     client.emit('message-from-server',payload);
   }
 
+  @SubscribeMessage('verify-seen-client')
+  async onVerifySeen(client: Socket, receivingClientId: string){
+    
+    const chatUpdated = await this.websocketsService.verifyAndUpdateSeen(client, receivingClientId)
+    const socketIdReceivingClient = this.websocketsService.getReceivingUserId(client, chatUpdated);
+
+    if(socketIdReceivingClient)
+      client.to(socketIdReceivingClient).emit('message-from-server',chatUpdated);
+
+    client.emit('message-from-server',chatUpdated);
+  }
+
 }

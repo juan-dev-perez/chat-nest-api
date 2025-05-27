@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { User } from '../users/schemas/user.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -23,7 +23,7 @@ export class ChatService {
             message
         };
 
-        const chat = await this.getOneChat(user,receivingUser);
+        const chat = await this.getOneChat(user._id,receivingUser);
 
         if(chat){
             chat.messages.push(messages);
@@ -50,27 +50,49 @@ export class ChatService {
         return {chats, users, user};
     }
 
-    async getOneChat(user: User, userDos: string){
-        const chat = await this.chatModel.findOne({ users: { $all: [user._id, userDos] } });
+    async getOneChat(id: string, userDos: string){
+        const chat = await this.chatModel.findOne({ users: { $all: [id, userDos] } });
+        if(!chat) throw new NotFoundException('chat not found');
         return chat;
     }
 
     async deleteOneMessage(user: User, userDos:string, idMessage: string){
-        const chat = await this.getOneChat(user, userDos);
+        try {
+            const chat = await this.getOneChat(user._id, userDos);
+            chat.messages = chat.messages.filter(message => message._id.toString() !== idMessage);
+            await chat.save();
+            return chat;
+        } catch (error) {
+            return error
+        }
 
-        if(!chat) throw new NotFoundException('chat not found');
-        
-        chat.messages = chat.messages.filter(message => message._id.toString() !== idMessage);
-
-        await chat.save();
-        return chat;
     }
 
     async deleteOneChat(user: User, userDos:string){
-        const chat = await this.getOneChat(user, userDos);
-        if(!chat) throw new NotFoundException('chat not found');
-
-        return await this.chatModel.findByIdAndDelete(chat._id);
+        try {
+            const chat = await this.getOneChat(user._id, userDos);
+            return await this.chatModel.findByIdAndDelete(chat._id);
+        } catch (error) {
+            return error;
+        }
     }
 
+    async updateSeen(sendingUserId: string, receivingUser: string){
+        try {
+            const chat = await this.getOneChat(sendingUserId, receivingUser);
+            chat.messages = chat.messages.map(message => {
+                if(message.sendingUser === receivingUser && message.seen === false){
+                    message.seen = true;
+                    return message;
+                }
+                return message;
+            });
+            await chat.save();
+            return chat;
+
+        } catch (error) {
+            throw new InternalServerErrorException(error);
+        }
+    }
+ 
 }

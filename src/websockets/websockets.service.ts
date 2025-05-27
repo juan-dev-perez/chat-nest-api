@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Socket } from 'socket.io';
@@ -6,6 +6,7 @@ import { User } from '../users/schemas/user.schema';
 import { ConnectedUsers } from './interfaces/sokets.interface';
 import { Chat } from '../chat/schemas/chat.schema';
 import { JwtService } from '@nestjs/jwt';
+import { ChatService } from 'src/chat/chat.service';
 
 @Injectable()
 export class WebsocketsService {
@@ -15,7 +16,7 @@ export class WebsocketsService {
     constructor(
         @InjectModel(User.name)
         private readonly userModel: Model<User>,
-        private readonly jwtService: JwtService,
+        private readonly chatService: ChatService,
     ){}
 
     async saveConnectedUser(client: Socket, idUser: string){
@@ -49,7 +50,7 @@ export class WebsocketsService {
                 return clientId;
             }
         }
-        console.log('Receiving user not connected');
+        // console.log('Receiving user not connected');
         return false;
     }
 
@@ -62,4 +63,10 @@ export class WebsocketsService {
             }
         }
     }
+
+    async verifyAndUpdateSeen(client:Socket, receivingUser: string){
+        const sendingUserId = this.connectedUsers[client.id].user._id.toString();
+        return await this.chatService.updateSeen(sendingUserId, receivingUser)
+    }
+
 }

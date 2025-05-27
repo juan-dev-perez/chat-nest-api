@@ -13,6 +13,7 @@ import { UsersModule } from '../users/users.module';
     AuthModule,
   ],
   controllers: [ChatController],
-  providers: [ChatService]
+  providers: [ChatService],
+  exports: [ChatService],
 })
 export class ChatModule {}
